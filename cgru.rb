@@ -3,7 +3,7 @@ require "formula"
 
 class Cgru < Formula
   homepage "http://cgru.info"
-  url "https://github.com/CGRU/cgru", :using => :git, :tag => '2.0.3'
+  url "https://github.com/CGRU/cgru", :using => :git, :tag => '2.0.8'
   head "https://github.com/CGRU/cgru", :using => :git
 
   option "with-sql", "Enable postgresql support"
@@ -11,14 +11,17 @@ class Cgru < Formula
 
   depends_on "cmake" => :build
   depends_on "imagemagick" => :recommended
+  depends_on "openexr" => :recommended
   depends_on "ffmpeg" => :recommended
   depends_on "pyqt" => [:recommended, "with-python3"]
   depends_on "postgresql" => :build if build.with? "sql"
 
 
   def install
-    ENV["AF_PYTHON_INCLUDE_PATH"]="/usr/local/Frameworks/Python.framework/Versions/3.4/include/python3.4m"
-    ENV["AF_PYTHON_LIBRARIES"]="/usr/local/Frameworks/Python.framework/Versions/3.4/lib/libpython3.4m.dylib"
+
+	pyv = Language::Python.major_minor_version "python3"
+	ENV["AF_PYTHON_INCLUDE_PATH"]="/usr/local/Frameworks/Python.framework/Versions/#{pyv}/include/python#{pyv}m"
+	ENV["AF_PYTHON_LIBRARIES"]="/usr/local/Frameworks/Python.framework/Versions/#{pyv}/lib/libpython#{pyv}m.dylib"
     ENV["AF_GUI"]="YES"
     ENV["AF_POSTGRESQL"]="NO"
     ENV["AF_GUI"]="NO" if build.without? "gui"
@@ -27,8 +30,12 @@ class Cgru < Formula
     cd('afanasy/src/project.cmake') do
         #args = std_cmake_args
         system "cmake", ".", *std_cmake_args
-        system "make -j9"
+        system "make -j8"
     end
+
+	cd('utilities/exrjoin') do
+		system "g++ -o ../../bin/exrjoin -Wall -O2 -DNDEBUG `/usr/local/bin/pkg-config --libs --cflags OpenEXR` exrjoin.cpp"
+	end
 
     exclude = Array.new()
     exclude.push(*["--exclude",".git"])
