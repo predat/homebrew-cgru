@@ -4,7 +4,7 @@ This repository contains formulae for [Homebrew](https://github.com/mxcl/homebre
 
 Installing Homebrew-cgru Formulaes
 ----------------------------------
-Just `brew top predat/homebrew-cgru`and then `brew install <formula>`.
+Just `brew tap predat/homebrew-cgru`and then `brew install <formula>`.
 
 You can also install via URL:
 ```
